@@ -12,6 +12,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.revature.conversion.model.CurrencyConversion;
 import com.revature.conversion.service.CurrencyConversionService;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+import java.net.ConnectException;
 @RestController
 public class CurrencyConversionController {
 
@@ -20,6 +24,9 @@ public class CurrencyConversionController {
 	private CurrencyConversionService currencyConversionService;
 	
 	 @GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
+	 @CircuitBreaker(name="myexchange",fallbackMethod = "fallbackMethod")
+	// @TimeLimiter(name = "myexchange")
+	    @Retry(name = "myexchange")
 	    public CurrencyConversion calculateCurrencyConversion(
 	            @PathVariable String from,
 	            @PathVariable String to,
@@ -36,4 +43,10 @@ public class CurrencyConversionController {
 	                currencyConversion.getEnvironment()+ " " + "rest template");
 
 	    }
+	 public CurrencyConversion fallbackMethod(String from, String
+			  to, BigDecimal quantity,Exception exception) {
+			return new CurrencyConversion(1L,"Default Currency","Default Currency",
+					BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,"There is some server error at the moment");
+			
+		}
 }
