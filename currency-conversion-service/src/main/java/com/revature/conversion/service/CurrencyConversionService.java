@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.kafka.core.KafkaTemplate;
+
+import com.revature.conversion.event.CurrencyEvent;
 import com.revature.conversion.model.CurrencyConversion;
 import com.revature.conversion.model.CurrencyExchange;
 
@@ -20,7 +23,8 @@ public class CurrencyConversionService {
 	private WebClient webClient;
 	@Autowired
 	DiscoveryClient discoveryClient;
-	
+	@Autowired
+	private KafkaTemplate<String, CurrencyEvent> kafkaTemplate;
 	
 	  public CurrencyConversion calculateCurrencyConversion( String from, String
 	  to, BigDecimal quantity) {
@@ -31,6 +35,12 @@ public class CurrencyConversionService {
 	  .path("currency-exchange/from/{from}/to/{to}") .build(from,to)) .retrieve()
 	  .bodyToMono(CurrencyConversion.class) .block();
 	  
+	  // use kafka here as a producer
+	/*  kafkaTemplate.send("notificationTopic",new CurrencyEvent(this,
+			  currencyConversion.getId(), currencyConversion.getFrom(), 
+			  currencyConversion.getTo()));
+		*/
+		System.out.println("notofocation sent");
 	  return currencyConversion;
 	  
 		 

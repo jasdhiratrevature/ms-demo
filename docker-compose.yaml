@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  discovery-service:
+    image: jasdhirtech/discovery-service
+    ports:
+      - 8761:8761
+    
+  api-gateway:
+    image: jasdhirtech/api-gateway
+    ports:
+      - 9095:9095
+    depends_on:
+      - discovery-service
+
+  currency-exchange-service:
+    image: jasdhirtech/currency-exchange-service
+    ports:
+      - 8081:8081
+    depends_on:
+      - discovery-service
+      - api-gateway
+
+  currency-conversion-service:
+    image: jasdhirtech/currency-conversion-service
+    ports:
+      - 8082:8082
+    depends_on:
+      - discovery-service
+      - api-gateway
+      - currency-exchange-service  
+  
+    
+
+  
+
